@@ -44,16 +44,15 @@
             <h2>{{ course.name }}</h2>
             <div class="card-columns-vertical">
                 {% for lesson in course.lesson_set.all %}
-                    <div class="card mt-1">
+                    <div class="card mt-1" id="parent">
                         <div class="card-header"><h5>Lesson {{lesson.order|add:1}}: {{lesson.title}}</h5></div>
                         <div class="card-body">{{lesson.content}}</div>
                     </div>
 
                     {% if user.is_authenticated %}
-                    <!-- <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#exam">
-                    <div id="exam" class="collapse"> -->
+                    
                     <button data-toggle="collapse" class="btn btn-info" data-target="#exam">Click here to expand/collapse the exam section</button>
-                    <div id="exam" class="collapse">
+                    <div id="exam" class="collapse indent">
                     <form id="questionform" action="point to a submit view" method="post">
                                 <!-- ... for each question in the course ... -->
                                 {% for question in lesson.question_set.all %}
