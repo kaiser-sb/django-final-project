@@ -27,8 +27,8 @@
                     <form class="form-inline" action="{% url 'onlinecourse:login' %}" method="post">
                         {% csrf_token %}
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Username" name="username" >
-                            <input type="password" class="form-control" placeholder="Username" name="psw" >
+                            <input type="text" class="form-control" placeholder="Enter Username" name="username" >
+                            <input type="password" class="form-control" placeholder="Enter Password" name="psw" >
                             <button class="btn btn-primary" type="submit">Login</button>
                             <a class="btn btn-link" href="{% url 'onlinecourse:registration' %}">Sign Up</a>
                         </div>
@@ -51,8 +51,8 @@
 
                     {% if user.is_authenticated %}
                     
-                    <button data-toggle="collapse" class="btn btn-info" data-target="#exam">Click here to expand/collapse the exam section</button>
-                    <div id="exam" class="collapse indent">
+                    <button data-toggle="collapse" class="btn btn-info" data-target="#exam_{{lesson.order|add:1}}">Click here to expand/collapse the exam section</button>
+                    <div id="exam_{{lesson.order|add:1}}" class="collapse indent">
                     <form id="questionform" action="point to a submit view" method="post">
                                 <!-- ... for each question in the course ... -->
                                 {% for question in lesson.question_set.all %}
