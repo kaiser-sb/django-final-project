@@ -53,14 +53,14 @@
                     
                     <button data-toggle="collapse" class="btn btn-info" data-target="#exam_{{lesson.order|add:1}}">Click here to expand/collapse the exam section</button>
                     <div id="exam_{{lesson.order|add:1}}" class="collapse indent">
-                    <form id="questionform" action="{% url 'onlinecourse:submit' course.id submission.id %}" method="post">
+                    <form id="questionform" action="{% url 'onlinecourse:submit' course.id %}" method="post">
                                 <!-- ... for each question in the course ... -->
                                 {% for question in lesson.question_set.all %}
                                 <div class="card mt-1">
                                     <div class="card-header"><h5>{{question.content}}</h5></div>
                                     {% csrf_token %}
                                     <div class="form-group">
-                                    <!-- ... for each choice in the question ... -->
+                                    <!-- ... for each choice in the question ... --> 
                                     {% for choice in question.choice_set.all %}
                                         <div class="form-check">
                                             <label class="form-check-label">
