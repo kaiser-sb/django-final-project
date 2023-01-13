@@ -36,17 +36,17 @@
 </nav>
 
 <div class="container-fluid">
-    {% if grade > 80 %}
+    {% if grade > 80 %} 
     <div class="alert alert-success">
        <!--HINT Display passed info -->
        <b>Congratulations {{user.first_name}}</b>
-       <p>You have passed the exam with <b>{{grade}}%</b> of total marks!</p>
+       <p>You have passed the exam with <b>{{grade}}</b> of total marks!</p>
     </div>
         {% else %}
         <div class="alert alert-danger">
             <!--HINT Display failed info -->
             <b>Sorry {{user.first_name}}</b>
-            <p>You have failed the exam. You scored <b>{{grade}}%</b> of total marks! You need to score
+            <p>You have failed the exam. You scored <b>{{grade}}</b> of total marks! You need to score
                 at least <b>80%</b>!
             </p>
         </div>
@@ -55,7 +55,7 @@
         <div class="card-columns-vertical mt-1">
         <h5 class="">Exam results</h5>
             <!--HINT Display exam results-->
-            {% for question in course.question_set.all %}
+            <!-- {% for question in course.question_set.all %}
            <div class="card mt-1">
                <div class="card-header"><h5>{{ question.content }}</h5></div>
                <div class="form-group">
@@ -76,7 +76,7 @@
                    {% endfor %}
                </div>
            </div>
-           {% endfor %}
+           {% endfor %} -->
         </div>
     </div>
 </body>
