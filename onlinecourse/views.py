@@ -110,18 +110,19 @@ def enroll(request, course_id):
          # Collect the selected choices from exam form
          # Add each selected choice object to the submission object
          # Redirect to show_exam_result with the submission id
-def submit(request, course_id):
+def submit(request, course_id, lesson_id):
     course = get_object_or_404(Course, pk=course_id)
     user = request.user
     
     enrollment = Enrollment.objects.get(user=user, course=course)
     submission = Submission.objects.create(enrollment=enrollment)
-    submission_id = submission.id 
+    submission_id = submission.id
 
     total_choices = extract_answers(request)
+    # lesson_id = total_choices[0].question.lesson.order
     submission.choices.set(total_choices)
 
-    return HttpResponseRedirect(reverse(viewname="onlinecourse:exam_result", args=(course_id, submission_id)))
+    return HttpResponseRedirect(reverse(viewname="onlinecourse:exam_result", args=(course_id, lesson_id, submission_id)))
     
 
 # <HINT> A example method to collect the selected choices from the exam form from the request object
@@ -141,13 +142,19 @@ def extract_answers(request):
         # Get the selected choice ids from the submission record
         # For each selected choice, check if it is a correct answer or not
         # Calculate the total score
-def show_exam_result(request, course_id, submission_id):
+def show_exam_result(request, course_id, lesson_id, submission_id):
     context = {}
     course = get_object_or_404(Course, pk=course_id)
-    lesson = []
+    lesson = get_object_or_404(Lesson, pk=lesson_id) 
+    
     submission = Submission.objects.get(id=submission_id)
     choice_set = submission.choices.all()
+
+    # lesson_order = choice_set[0].question.lesson.order
+    # lesson = []
+
     question_ids = [] 
+    score = 0
     total_score = 0
     for choice in choice_set:
         question_ids.append(choice.question.id)
@@ -155,12 +162,16 @@ def show_exam_result(request, course_id, submission_id):
     question_ids = [*set(question_ids)]
     count = len(question_ids)
 
-    for q in question_ids:
-        curr_ques = Question.objects.get(id = q)
-        lesson.append(curr_ques.lesson)
-        choices = choice_set.filter(question= curr_ques)
-        if curr_ques.is_get_score(choices):
-            total_score += curr_ques.mark
+    if count > 0:
+        for q in question_ids:
+            curr_ques = Question.objects.get(id = q)
+            # lesson.append(curr_ques.lesson)
+            choices = choice_set.filter(question= curr_ques)
+            if curr_ques.is_get_score(choices):
+                score += curr_ques.mark
+        total_score = round((score/count)*100, 2)
+    else:
+        total_score
 
     # context['course'] = course
     # context['grade'] = round((total_score/count)*100, 2)
@@ -168,8 +179,8 @@ def show_exam_result(request, course_id, submission_id):
 
     context = {
         "course" : course,
-        "lesson" : lesson[0],
-        "grade" : round((total_score/count)*100, 2),
+        "lesson" : lesson,
+        "grade" : total_score,
         "choices" : choice_set
     }
 
