@@ -53,6 +53,8 @@
                     
                     <button data-toggle="collapse" class="btn btn-info" data-target="#exam_{{lesson.order|add:1}}">Click here to expand/collapse the exam section</button>
                     <div id="exam_{{lesson.order|add:1}}" class="collapse indent">
+                        <!-- ... Passed both course id and lesson id in action url ... -->
+                        <!-- ... Required to evaluate unattempted question ... -->
                     <form id="questionform" action="{% url 'onlinecourse:submit' course.id lesson.id %}" method="post">
                                 <!-- ... for each question in the course ... -->
                                 {% for question in lesson.question_set.all %}

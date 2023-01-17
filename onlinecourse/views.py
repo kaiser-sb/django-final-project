@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 # <HINT> Import any new Models here
-from .models import Course, Enrollment, Question, Choice, Submission
+from .models import Course, Enrollment, Lesson, Question, Choice, Submission
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
@@ -111,6 +111,7 @@ def enroll(request, course_id):
          # Add each selected choice object to the submission object
          # Redirect to show_exam_result with the submission id
 def submit(request, course_id, lesson_id):
+    # Lesson id retrieved from the exam form
     course = get_object_or_404(Course, pk=course_id)
     user = request.user
     
@@ -119,9 +120,10 @@ def submit(request, course_id, lesson_id):
     submission_id = submission.id
 
     total_choices = extract_answers(request)
-    # lesson_id = total_choices[0].question.lesson.order
     submission.choices.set(total_choices)
 
+    # Passing the lesson id retrieved from the exam form
+    # This makes the selection of lesson independent of any choices made
     return HttpResponseRedirect(reverse(viewname="onlinecourse:exam_result", args=(course_id, lesson_id, submission_id)))
     
 
@@ -142,41 +144,44 @@ def extract_answers(request):
         # Get the selected choice ids from the submission record
         # For each selected choice, check if it is a correct answer or not
         # Calculate the total score
+        
 def show_exam_result(request, course_id, lesson_id, submission_id):
+    # This lesson id is eventually used to retrieve the concerened lesson
     context = {}
+    # Get course
     course = get_object_or_404(Course, pk=course_id)
-    lesson = get_object_or_404(Lesson, pk=lesson_id) 
-    
+    # Get Lesson
+    lesson = get_object_or_404(Lesson, pk=lesson_id)
+    # Get question set for the above lesson
+    question_set = Question.objects.filter(lesson=lesson)
+    # Get submission object
     submission = Submission.objects.get(id=submission_id)
+    # Retrieve the choice set of the submission
     choice_set = submission.choices.all()
+    # Get the total question count related to the concerened lesson
+    count = question_set.count()
 
-    # lesson_order = choice_set[0].question.lesson.order
-    # lesson = []
-
+    # Retrieve question ids in choice set - 
+    # Required to evaluate multiple choice questions and unattempted questions
     question_ids = [] 
     score = 0
     total_score = 0
+
     for choice in choice_set:
         question_ids.append(choice.question.id)
 
     question_ids = [*set(question_ids)]
-    count = len(question_ids)
 
-    if count > 0:
-        for q in question_ids:
-            curr_ques = Question.objects.get(id = q)
-            # lesson.append(curr_ques.lesson)
-            choices = choice_set.filter(question= curr_ques)
-            if curr_ques.is_get_score(choices):
-                score += curr_ques.mark
-        total_score = round((score/count)*100, 2)
-    else:
-        total_score
+    for q in question_ids:
+        curr_ques = Question.objects.get(id = q)
+        choices = choice_set.filter(question=curr_ques)
+        if curr_ques.is_get_score(choices):
+            score += curr_ques.mark
+    
+    total_score = round((score/count)*100, 2)
 
-    # context['course'] = course
-    # context['grade'] = round((total_score/count)*100, 2)
-    # context['choices'] = choice_set
-
+    # Pass the context with the concerened lesson along with other parameters - 
+    # This helps in displaying the content related to the lesson only
     context = {
         "course" : course,
         "lesson" : lesson,
